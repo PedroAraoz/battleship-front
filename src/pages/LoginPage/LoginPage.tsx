@@ -28,7 +28,7 @@ const LoginPage = () => {
     function handleCredentialResponse(response: any) {
         setIsLoading(false)
         if (!!response) {
-            const payload = { credentials: response.credential };
+            const payload = { idToken: response.credential };
             fetch(`${process.env.REACT_APP_SERVER_URL}/user/login`, {
                 method: 'POST',
                 headers: {
