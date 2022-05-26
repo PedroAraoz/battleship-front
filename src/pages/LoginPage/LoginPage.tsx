@@ -29,7 +29,6 @@ const LoginPage = () => {
         setIsLoading(false)
         if (!!response) {
             const payload = { credentials: response.credential };
-            let res;
             fetch(`${process.env.REACT_APP_SERVER_URL}/user/login`, {
                 method: 'POST',
                 headers: {

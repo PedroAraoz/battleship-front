@@ -23,7 +23,7 @@ interface AuthContextType {
 let AuthContext = React.createContext<AuthContextType>(null!)
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  let [user, setUser] = React.useState<any>(undefined)
+  let [user, setUser] = React.useState<any>(undefined) // TODO on state init, get user from cookies if it exists
 
   let signin = (newUser: User, callback: VoidFunction) => {
     return myAuthProvider.signin(() => {

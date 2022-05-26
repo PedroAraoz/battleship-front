@@ -14,3 +14,9 @@
 .background.fullscreen {
     height: 100vh;
 }
+
+.banner-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}

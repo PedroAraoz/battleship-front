@@ -17,7 +17,7 @@ const Background = (props: React.PropsWithChildren<BackgroundProps>) => {
                     {children}
                 </div>
                 :
-                <div>
+                <div className="banner-wrapper">
                     <div className={'background'} />
                     {children}
                 </div>
