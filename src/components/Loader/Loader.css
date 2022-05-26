@@ -1,0 +1,50 @@
+.loader-wrapper {
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    position: relative;
+}
+
+.loader {
+    border: solid 4px;
+    animation-name: spin;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+/* sizes */
+
+.loader.sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 32px;
+}
+
+.loader.loader.lg {
+    width: 64px;
+    height: 64px;
+    border-radius: 64px;
+}
+
+/* colors */
+
+.loader.light {
+    border-color: rgba(255, 255, 255, 0.64) rgba(255, 255, 255, 0.64) rgba(255, 255, 255, 0.64) white;
+}
+
+.loader.dark {
+    border-color: rgba(0, 0, 0, 0.16) rgba(0, 0, 0, 0.16) rgba(0, 0, 0, 0.16) black;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

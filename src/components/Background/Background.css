@@ -1,0 +1,16 @@
+.background {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-image: linear-gradient(to bottom, rgba(255, 0, 0, 0.64), rgba(0, 0, 255, 0.64)),
+    url('../../assets/bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    height: 256px;
+}
+
+.background.fullscreen {
+    height: 100vh;
+}

@@ -1,0 +1,42 @@
+.card-wrapper {
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    position: relative;
+    transition: linear .25s;
+    background-color: white;
+}
+
+.card-wrapper:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.16);
+}
+
+.card-wrapper.transparent {
+    background-color: rgba(255, 255, 255, .64);
+}
+
+.card-wrapper.transparent:hover {
+    background-color: rgba(255, 255, 255, .80);
+}
+
+.card-wrapper.raised {
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.16);
+}
+
+.card-wrapper.lg {
+    padding: 64px;
+}
+
+.card-wrapper.sm {
+    padding: 16px;
+}
+
+.card-content {
+    align-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
