@@ -1,14 +1,13 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import Router from "./components/Router/Router";
+import React from 'react'
+import './App.css'
+import Router from "./components/Router/Router"
 
 function App() {
   return (
     <div className="App">
       <Router/>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

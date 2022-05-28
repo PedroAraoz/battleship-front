@@ -1,0 +1,54 @@
+.button-wrapper {
+    padding: 0 58px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    min-height: 64px;
+    border: none;
+    border-radius: 16px;
+    transition: linear .1s;
+}
+
+.button-wrapper:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+}
+
+.button-wrapper.red {
+    background-color: #f4655e;
+    color: white;
+}
+
+.button-wrapper.blue {
+    background-color: #4d4df3;
+    color: white;
+}
+
+.button-wrapper.disabled {
+    background-color: gray;
+    color: rgba(0, 0, 0, 0.16);
+}
+
+.button-wrapper.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.button-wrapper.loading:hover {
+    transform: none;
+    box-shadow: none;
+    cursor: wait;
+}
+
+.button-wrapper .button-loading {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.button-wrapper .button-loading .button-loading-text {
+    margin: 0 0 0 16px;
+}

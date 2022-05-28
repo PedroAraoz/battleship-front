@@ -1,5 +1,5 @@
-import React from "react";
-import Header from "../Header/Header";
+import React from "react"
+import Header from "../Header/Header"
 import "./Background.css"
 
 export type BackgroundProps = {

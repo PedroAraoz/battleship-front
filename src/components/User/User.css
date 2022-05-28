@@ -1,0 +1,27 @@
+.user-wrapper {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.user-chip-wrapper {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: white;
+    margin-right: 16px;
+}
+
+.user-chip-wrapper img {
+    height: auto;
+    width: 32px;
+    background-color: rgba(0, 0, 255, 0.64);
+    padding: 16px;
+}
+
+.user-chip-wrapper h3 {
+    font-size: 16px;
+    padding: 16px;
+    margin: 0;
+}
+

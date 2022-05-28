@@ -1,4 +1,7 @@
 export type User = {
     token: string,
-    name: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    imageUrl: string
 }

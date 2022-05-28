@@ -1,6 +1,6 @@
-import React from "react";
-import "./Message.css";
-import battleship from "../../assets/battleship.png";
+import React from "react"
+import "./Message.css"
+import battleship from "../../assets/battleship.png"
 
 export type MessageProps = {
     message: string,

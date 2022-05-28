@@ -1,5 +1,5 @@
-import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom'
-import React, { useEffect, useState } from 'react'
+import { Route, Routes, BrowserRouter } from 'react-router-dom'
+import React from 'react'
 import HomePage from '../../pages/HomePage/HomePage'
 import LoginPage from '../../pages/LoginPage/LoginPage'
 import { AuthProvider, RequireAuth } from '../../utils/auth'
