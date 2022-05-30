@@ -1,0 +1,8 @@
+.continue-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.continue-buttons button {
+    margin-bottom: 16px;
+}

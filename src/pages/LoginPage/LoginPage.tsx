@@ -4,7 +4,6 @@ import Background from "../../components/Background/Background"
 import Card from "../../components/Card/Card"
 import Loader from "../../components/Loader/Loader"
 import Message from "../../components/Message/Message"
-import User from "../../components/User/User"
 import { useAuth } from "../../utils/auth"
 import "./LoginPage.css"
 
@@ -17,10 +16,9 @@ const LoginPage = () => {
     let location = useLocation() as unknown as LocationProps
     let auth = useAuth()
 
-    const [isLoading, setIsLoading] = useState(false)
+    let [isLoading, setIsLoading] = useState(false)
 
     const from = location.state?.from?.pathname || "/home"
-    const message = "Please login with your Google account to start playing!"
 
     function handleCredentialResponse(response: any) {
         setIsLoading(true)
@@ -59,7 +57,7 @@ const LoginPage = () => {
                 <Loader size={"lg"} color={"light"} />
                 :
                 <Card size="lg" raised transparent>
-                    <Message message={message} />
+                    <Message messages={[{id: "login-message-1", message: "Please login with your Google account to start playing!"}]} />
                     <div id="g_id_onload"
                         data-client_id={process.env.REACT_APP_GOOGLE_CLIENT_ID}
                         data-callback={"handleCredentialResponse"}>

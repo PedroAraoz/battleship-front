@@ -1,6 +1,6 @@
 import React from "react"
 import { Navigate, useLocation, useNavigate } from "react-router-dom"
-import { User } from "../models"
+import { AuthUser } from "../models"
 
 const myAuthProvider = {
     signin(callback: VoidFunction) {
@@ -12,15 +12,15 @@ const myAuthProvider = {
 }
 
 interface AuthContextType {
-    user: () => User | undefined
-    signin: (user: User, callback: VoidFunction) => void
+    user: () => AuthUser | undefined
+    signin: (user: AuthUser, callback: VoidFunction) => void
     signout: (callback: VoidFunction) => void
 }
 
 let AuthContext = React.createContext<AuthContextType>(null!)
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-    let user = (): User | undefined => {
+    let user = (): AuthUser | undefined => {
         if (window.sessionStorage.getItem("token") 
         && window.sessionStorage.getItem("firstName") 
         && window.sessionStorage.getItem("lastName")
@@ -37,13 +37,13 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         return undefined
     }
 
-    let signin = (newUser: User, callback: VoidFunction) => {
+    let signin = (newUser: AuthUser, callback: VoidFunction) => {
         return myAuthProvider.signin(() => {
             window.sessionStorage.setItem("token", newUser.token)
             window.sessionStorage.setItem("firstName", newUser.firstName)
             window.sessionStorage.setItem("lastName", newUser.lastName)
             window.sessionStorage.setItem("email", newUser.email)
-            window.sessionStorage.setItem("imageUrl", newUser.imageUrl)
+            window.sessionStorage.setItem("imageUrl", newUser.imageUrl ? newUser.imageUrl : "")
             callback()
         })
     }

@@ -1,0 +1,36 @@
+.game-card-wrapper {
+    margin-bottom: 16px;
+}
+
+.game-card-wrapper .game-card-summary-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 12px 8px;
+}
+
+.game-card-wrapper .game-card-summary-wrapper h4 {
+    margin: 0;
+}
+
+.game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper h4 {
+    margin-right: 12px;
+}
+
+.game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper.victory {
+    color: #5C5CFF;
+}
+
+.game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper.defeat {
+    color: #E9404E;
+}
+
+.game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper.surrendered {
+    color: #E9404E;
+}
