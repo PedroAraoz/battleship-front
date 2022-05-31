@@ -5,6 +5,7 @@ import LoginPage from '../../pages/LoginPage/LoginPage'
 import { AuthProvider, RequireAuth } from '../../utils/auth'
 import GamePage from '../../pages/GamePage/GamePage'
 import ContinuePage from '../../pages/ContinuePage/ContinuePage'
+import Chat from "../../pages/Game/Game";
 
 const Router = () => {
     return (
@@ -26,6 +27,11 @@ const Router = () => {
                         <RequireAuth>
                             <ContinuePage />
                         </RequireAuth>
+                    } />
+                    <Route path={"/game2"} element={
+                        // <RequireAuth>
+                            <Chat />
+                        // </RequireAuth>
                     } />
                 </Routes>
             </AuthProvider>
