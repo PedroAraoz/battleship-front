@@ -5,7 +5,7 @@ import LoginPage from '../../pages/LoginPage/LoginPage'
 import { AuthProvider, RequireAuth } from '../../utils/auth'
 import GamePage from '../../pages/GamePage/GamePage'
 import ContinuePage from '../../pages/ContinuePage/ContinuePage'
-import Chat from "../../pages/Game/Game";
+import JoinGame from "../../pages/JoinGame/JoinGame";
 
 const Router = () => {
     return (
@@ -18,19 +18,19 @@ const Router = () => {
                             <HomePage />
                         </RequireAuth>
                     } />
-                    <Route path={"/game"} element={
-                        <RequireAuth>
-                            <GamePage />
-                        </RequireAuth>
-                    } />
                     <Route path={"/continue"} element={
                         <RequireAuth>
                             <ContinuePage />
                         </RequireAuth>
                     } />
-                    <Route path={"/game2"} element={
+                    <Route path={"/join"} element={
                         // <RequireAuth>
-                            <Chat />
+                            <JoinGame />
+                        // </RequireAuth>
+                    } />
+                    <Route path={"/game/:id"} element={
+                        // <RequireAuth>
+                        <GamePage />
                         // </RequireAuth>
                     } />
                 </Routes>
