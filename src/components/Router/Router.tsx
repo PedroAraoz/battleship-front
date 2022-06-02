@@ -28,7 +28,7 @@ const Router = () => {
                             <JoinGame />
                         // </RequireAuth>
                     } />
-                    <Route path={"/game/:id"} element={
+                    <Route path={"/game/:gameId"} element={
                         // <RequireAuth>
                         <GamePage />
                         // </RequireAuth>

@@ -3,7 +3,7 @@ import {useAuth} from "./auth";
 
 // let auth = useAuth()
 // let token = auth.user.arguments.token
-const token = 'pedro@mail.com';
+export const token = 'pedro@mail.com';
 
 
 const request = (path: string, method: string) => {
