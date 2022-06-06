@@ -1,0 +1,97 @@
+.game-board-wrapper {
+    margin-top: 64px;
+    display: flex;
+    flex-direction: row;
+}
+
+.game-board-wrapper .card-wrapper {
+    width: 100%;
+    margin: 0 64px 0 0;
+}
+
+.game-board-card-head {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 32px;
+}
+
+.game-board-card-head h4 {
+    margin: 8px;
+}
+
+.game-board-card-head .time {
+    display: flex;
+    align-items: center;
+}
+
+.game-board-card-body {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom: 32px;
+}
+
+.game-ships {
+    display: flex;
+    flex-direction: column;
+}
+
+.ship-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px;
+    border: solid 1px transparent;
+    border-radius: 16px;
+}
+
+.ship-wrapper h4 {
+    min-width: 128px;
+    margin: 0;
+}
+
+.ship-wrapper:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, .04);
+}
+
+.ship-wrapper.selected {
+    background-color: rgba(0, 0, 0, .04);
+}
+
+.ship-wrapper.selected h4 {
+    color: #5C5CFF;
+}
+
+.ship-wrapper.placed {
+    opacity: .16;
+    cursor: not-allowed;
+}
+
+.ship-block {
+    width: 24px;
+    height: 24px;
+    background-color: rgba(0, 0, 0, .64);
+    border: solid 1px white;
+}
+
+.game-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.game-actions .actions-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.game-actions .button-wrapper {
+    margin-bottom: 8px;
+    margin-top: 8px;
+}

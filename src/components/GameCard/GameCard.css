@@ -30,7 +30,3 @@
 .game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper.defeat {
     color: #E9404E;
 }
-
-.game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper.surrendered {
-    color: #E9404E;
-}

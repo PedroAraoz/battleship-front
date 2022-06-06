@@ -1,7 +1,7 @@
-import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material"
-import { ExpandMore, Stars } from "@mui/icons-material"
+import {Accordion, AccordionDetails, AccordionSummary} from "@mui/material"
+import {ExpandMore, Stars} from "@mui/icons-material"
 import React from "react"
-import { GameState, GameSummary } from "../../models"
+import {GameState, GameSummary} from "../../models"
 import "./GameCard.css"
 
 export type GameProps = {
@@ -24,7 +24,7 @@ const GameCard = (props: GameProps) => {
             <Accordion style={{"boxShadow": "none"}} expanded={expanded === `${summary.gameId}`} onChange={handleChange(`${summary.gameId}`)}>
                 <AccordionSummary expandIcon={<ExpandMore />} aria-controls={`${summary.gameId}-content`} id={`${summary.gameId}-header`}>
                     <div className="game-card-summary-wrapper">
-                        <h4>{summary.enemyName}</h4>
+                        <h4>{`${summary.enemy.firstName} ${summary.enemy.lastName}`}</h4>
                         <div className={`game-card-summary-result-wrapper ${summary.result}`}>
                             <h4>{summary.result}</h4>
                             <Stars/>

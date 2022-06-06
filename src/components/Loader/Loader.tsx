@@ -7,15 +7,17 @@ type LoaderColor = 'light' | 'dark'
 
 type LoaderProps = {
     size: LoaderSize,
-    color: LoaderColor
+    color: LoaderColor,
+    text?: string
 }
 
 const Loader = (props: LoaderProps) => {
-    const {size, color} = props
+    const {size, color, text} = props
 
     return (
         <div className="loader-wrapper">
             <div className={`loader ${size} ${color}`}/>
+            <p>{text}</p>
         </div>
     )
 }

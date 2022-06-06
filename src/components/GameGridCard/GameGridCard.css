@@ -1,0 +1,52 @@
+.game-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.coordinates-x {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.grid-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.grid-row h4, .coordinates-x h4 {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    padding: 1px;
+}
+
+.grid-point {
+    height: 24px;
+    width: 24px;
+    background-color: rgba(0, 0, 0, .04);
+    border: solid 1px white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.grid-point.water {
+    background-color: #5C5CFF;
+    border: solid 1px white;
+}
+
+.grid-point.ship {
+    background-color: rgba(0, 0, 0, .64);
+}
+
+.grid-point.placing {
+    background-color: rgba(0, 0, 0, .16);
+}

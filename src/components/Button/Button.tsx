@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react"
+import React, {PropsWithChildren} from "react"
 import Loader from "../Loader/Loader"
 import "./Button.css"
 
@@ -16,11 +16,10 @@ const Button = (props: PropsWithChildren<ButtonProps>) => {
     const { children, onClick, type, disabled, loading, loadingText } = props
 
     return (
-        <button className={`button-wrapper ${type} ${disabled ? "disabled" : ""} ${loading ? "loading" : ""}`} onClick={onClick} disabled={disabled}>
+        <button className={`button-wrapper ${type} ${disabled ? "disabled" : ""} ${loading ? "loading" : ""}`} onClick={onClick} disabled={disabled || loading}>
             {loading ?
                 <div className="button-loading">
-                    <Loader size={"sm"} color={type === "white" ? "dark" : "light"} />
-                    <p className="button-loading-text">{loadingText}</p>
+                    <Loader text={loadingText} size={"sm"} color={type === "white" ? "dark" : "light"} />
                 </div>
                 :
                 children

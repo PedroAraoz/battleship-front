@@ -5,6 +5,13 @@
     top: 0;
     bottom: 0;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader-wrapper p {
+    margin-left: 16px;
 }
 
 .loader {

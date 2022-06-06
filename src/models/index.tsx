@@ -12,13 +12,12 @@ export type AuthUser = User & {
 export enum GameResult {
     VICTORY = "victory",
     DEFEAT = "defeat",
-    SURRENDERED = "surrendered",
 }
 
 export type GameSummary = {
     gameId: string | number,
-    enemyName: string,
-    result: GameResult
+    enemy: User,
+    result?: GameResult
 }
 
 export type Game = GameSummary & {
@@ -36,16 +35,27 @@ export type GameGrid = {
 
 export type GameGridPoint = {
     type: GameGridPointType,
-    fired: boolean
+    fired: boolean,
+    hidden: boolean,
+    placingShip: boolean
 }
 
 export enum GameGridPointType {
-    WATER,
-    SHIP
+    WATER = "water",
+    SHIP = "ship"
 }
 
 export type Ship = {
     name: string,
     size: number,
     imageUrl?: string
+}
+
+export type SetupShip = Ship & {
+    placed: boolean
+}
+
+export enum ShipOrientation {
+    VERTICAL,
+    HORIZONTAL
 }

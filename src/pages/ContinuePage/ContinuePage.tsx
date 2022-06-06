@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { Navigate, useLocation, useNavigate } from "react-router-dom"
+import React from "react"
+import {Navigate, useLocation, useNavigate, useParams} from "react-router-dom"
 import Background from "../../components/Background/Background"
 import Button from "../../components/Button/Button"
 import Card from "../../components/Card/Card"
@@ -14,30 +14,25 @@ const ContinuePage = () => {
     let navigate = useNavigate()
     let location = useLocation() as unknown as LocationProps
 
-    let [hasOngoingGame, setHasOngoingGame] = useState(false)
+    let {gameId} = useParams() // TODO if gameId doesn't correspond to an ongoing game involving the logged in user, redirect to not found
 
     const from = location.state?.from?.pathname || "/home"
 
     function keepPlaying(): void {
-        navigate("/game", { replace: true })
+        navigate(`/game/${gameId}`, { replace: true })
     }
 
     function surrender(): void {
+        // TODO surrender logic
         navigate("/home", { replace: true })
     }
 
-    useEffect(() => {
-        // fetch if user has a game ongoing and update state accordingly
-    }, [])
-
-    return false ? (
-        <Navigate to={from} state={{ from: location }} replace />
-    ) : (
+    return gameId ? (
         <Background fullscreen>
             <Card size="lg" raised transparent>
                 <Message messages={[
-                    {id: "continue-message-1", message: "You have an unfinished game that is still going."}, 
-                    {id: "continue-message-2", message:"What would you like to do?"}]} />
+                    {id: "continue-message-1", message: "You have an unfinished game that is still going."},
+                    {id: "continue-message-2", message: "What would you like to do?"}]}/>
                 <div className="continue-buttons">
                     <Button onClick={keepPlaying} type={"white"}>
                         KEEP PLAYING
@@ -48,6 +43,8 @@ const ContinuePage = () => {
                 </div>
             </Card>
         </Background>
+    ) : (
+        <Navigate to={from} state={{from: location}} replace/>
     )
 }
 

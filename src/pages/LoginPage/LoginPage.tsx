@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react"
-import { Navigate, useLocation, useNavigate } from "react-router-dom"
+import React, {useEffect, useState} from "react"
+import {Navigate, useLocation, useNavigate} from "react-router-dom"
 import Background from "../../components/Background/Background"
 import Card from "../../components/Card/Card"
 import Loader from "../../components/Loader/Loader"
 import Message from "../../components/Message/Message"
-import { useAuth } from "../../utils/auth"
+import {useAuth} from "../../utils/auth"
 import "./LoginPage.css"
+import {post} from "../../utils/fetch"
 
 type LocationProps = {
     state: { from: Location }
@@ -20,37 +21,23 @@ const LoginPage = () => {
 
     const from = location.state?.from?.pathname || "/home"
 
-    function handleCredentialResponse(response: any) {
-        setIsLoading(true)
-        if (!!response) {
-            const payload = { idToken: response.credential }
-            fetch(`${process.env.REACT_APP_SERVER_URL}/user/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data)
-                    auth.signin(data, () => {
-                        navigate(from, { replace: true })
-                    })
-                })
-                .catch((error) => {
-                    console.error('Error:', error)
-                    setIsLoading(false)
-                })
-        }
-    }
-
     useEffect(() => {
         (window as any).handleCredentialResponse = handleCredentialResponse
     }, [])
 
+    function handleCredentialResponse(response: any) {
+        setIsLoading(true)
+        if (!!response) {
+            const body = { idToken: response.credential }
+            post("user/login", null, JSON.stringify(body))
+                .then(data => {auth.signin({...data, token: body.idToken}, () => {
+                        navigate(from, { replace: true })
+                })})
+        }
+    }
+
     return !!auth.user() ? (
-        <Navigate to="/home" state={{ from: location }} replace />
+        <Navigate to={from} state={{ from: location }} replace />
     ) : (
         <Background fullscreen>
             {isLoading ?
@@ -62,8 +49,7 @@ const LoginPage = () => {
                         data-client_id={process.env.REACT_APP_GOOGLE_CLIENT_ID}
                         data-callback={"handleCredentialResponse"}>
                     </div>
-                    <div className="g_id_signin"
-                        data-type="standard" />
+                    <div className="g_id_signin" data-type="standard" />
                 </Card>
             }
         </Background>

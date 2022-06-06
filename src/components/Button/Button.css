@@ -26,15 +26,24 @@
     color: white;
 }
 
+.button-wrapper.white {
+    background-color: white;
+    color: black;
+}
+
 .button-wrapper.disabled {
-    background-color: gray;
-    color: rgba(0, 0, 0, 0.16);
+    background-color: rgba(191, 191, 191);
+    color: rgba(0, 0, 0, 0.64);
 }
 
 .button-wrapper.disabled:hover {
     transform: none;
     box-shadow: none;
     cursor: not-allowed;
+}
+
+.button-wrapper.loading {
+    background-color: white;
 }
 
 .button-wrapper.loading:hover {
