@@ -11,6 +11,8 @@ import Button from "../../components/Button/Button"
 import Card from "../../components/Card/Card"
 import "./GamePage.css"
 import GameGridCard from "../../components/GameGridCard/GameGridCard"
+import {useAuth} from "../../utils/auth"
+import {ControlCamera} from "@mui/icons-material"
 
 const GRID_SIZE = 10
 
@@ -31,6 +33,7 @@ enum GamePhase {
 
 const GamePage = () => {
     let navigate = useNavigate()
+    let auth = useAuth()
 
     let {gameId} = useParams() // TODO if gameId doesn't correspond to an ongoing game involving the logged in user, redirect to not found
 
@@ -41,6 +44,9 @@ const GamePage = () => {
     let [setupGameShips, setSetupGameShips] = useState(ships)
     let [setupShipOrientation, setSetupShipOrientation] = useState<ShipOrientation>(ShipOrientation.HORIZONTAL)
     let [setupShipSelected, setSetupShipSelected] = useState<SetupShip>()
+
+    let [enemyGameGrid, setEnemyGameGrid] = useState(getCleanGameGrid())
+    let [selectedEnemyGamePoint, setSelectedEnemyGamePoint] = useState<GameGridPoint>(undefined)
 
     let [stompClient, setStompClient] = useState(null)
     let [messages, setMessages] = useState([])
@@ -70,7 +76,7 @@ const GamePage = () => {
     }
 
     function checkIfGameStarted() {
-        get(`game/started/${gameId}`).then(data => {(data.res === 'true') ? loadGame() : joinGame()})
+        get(`game/started/${gameId}`, auth.user().token).then(data => {(data.res === 'true') ? loadGame() : joinGame()})
     }
 
     function loadGame() {
@@ -81,7 +87,7 @@ const GamePage = () => {
     }
 
     function joinGame() {
-        setSub(stompClient.subscribe(`/queue/messages/${gameId}`, onMessageReceived))
+        setSub(stompClient.subscribe(`/queue/messages/${gameId}`, onMessageReceived)) //TODO add /userId
     }
 
     function getGamePhase() {
@@ -107,7 +113,11 @@ const GamePage = () => {
                     type: GameGridPointType.WATER,
                     fired: false,
                     hidden: false,
-                    placingShip: false
+                    placingShip: false,
+                    coordinates: {
+                        x: j,
+                        y: i
+                    }
                 })
             }
         }
@@ -123,7 +133,25 @@ const GamePage = () => {
     }
 
     function randomizeSetupGrid() {
-        // TODO randomize logic
+        let placedShips = setupGameShips.filter(s => s.placed)
+        if (placedShips.length === 0 || placedShips.length === setupGameShips.length) {
+            let ships = [...setupGameShips]
+            ships.forEach(s => {
+                setSetupShipSelected(s)
+                let i = Math.floor(Math.random() * 10)
+                let j = Math.floor(Math.random() * 10)
+                let placing = onGridPointHover(i, j)
+                while (!placing) {
+                    i = Math.floor(Math.random() * 10)
+                    j = Math.floor(Math.random() * 10)
+                    placing = onGridPointHover(i, j)
+                    console.log(placing)
+                }
+                onGridPointClick(i, j)
+            })
+        } else {
+
+        }
     }
 
     function resetSetupGrid() {
@@ -132,7 +160,7 @@ const GamePage = () => {
     }
 
     function confirmSetupGrid() {
-
+        setGamePhase(GamePhase.HOME_TURN)
     }
 
     function changeSetupShipOrientation() {
@@ -140,7 +168,7 @@ const GamePage = () => {
             ShipOrientation.VERTICAL : ShipOrientation.HORIZONTAL)
     }
 
-    function onGridPointClick() {
+    function onGridPointClick(i, j) {
         if(setupShipSelected && !setupShipSelected.placed) {
             let auxGridData = {gridBlocks: [...setupGameGrid.gridBlocks]}
             let placedShip = false
@@ -179,8 +207,9 @@ const GamePage = () => {
         return overlaps
     }
 
-    function onGridPointHover(i, j) {
+    function onGridPointHover(i, j): boolean {
         let auxGridData = {gridBlocks: [...setupGameGrid.gridBlocks]}
+        let placing = false
         if (setupShipSelected && !setupShipSelected.placed) {
             let gridSize = auxGridData.gridBlocks.length
             if (setupShipOrientation === ShipOrientation.HORIZONTAL) {
@@ -188,6 +217,7 @@ const GamePage = () => {
                     if (!overlapsShipHorizontally(i, j)) {
                         for (let n = 0; n < setupShipSelected.size; n++) {
                             auxGridData.gridBlocks[i][j + n].placingShip = true
+                            placing = true
                         }
                     }
                 }
@@ -196,12 +226,14 @@ const GamePage = () => {
                     if (!overlapsShipVertically(i, j)) {
                         for (let n = 0; n < setupShipSelected.size; n++) {
                             auxGridData.gridBlocks[i + n][j].placingShip = true
+                            placing = true
                         }
                     }
                 }
             }
         }
         setSetupGameGrid(auxGridData)
+        return placing
     }
 
     function onGridPointLeave() {
@@ -212,6 +244,46 @@ const GamePage = () => {
             }
         }
         setSetupGameGrid(auxGridData)
+    }
+
+    function onEnemyGridPointClick(i, j) {
+        setSelectedEnemyGamePoint(enemyGameGrid.gridBlocks[i][j])
+    }
+
+    function onEnemyGridPointHover(i, j) {
+        let auxGridData = {gridBlocks: [...enemyGameGrid.gridBlocks]}
+        auxGridData.gridBlocks[i][j].placingShip = true
+        setEnemyGameGrid(auxGridData)
+    }
+
+    function onEnemyGridPointLeave() {
+        let auxGridData = {gridBlocks: [...enemyGameGrid.gridBlocks]}
+        for (let i = 0; i < setupGameGrid.gridBlocks.length; i++) {
+            for (let j = 0; j < setupGameGrid.gridBlocks.length; j++) {
+                auxGridData.gridBlocks[i][j].placingShip = false
+            }
+        }
+        setEnemyGameGrid(auxGridData)
+    }
+
+    function fireSelectedEnemyGamePoint() {
+        let auxGridData = {gridBlocks: [...enemyGameGrid.gridBlocks]}
+        let i = selectedEnemyGamePoint.coordinates.y
+        let j = selectedEnemyGamePoint.coordinates.x
+        auxGridData.gridBlocks[i][j].fired = true
+        setEnemyGameGrid(auxGridData)
+    }
+
+    function fireRandomEnemyGamePoint() {
+        let auxGridData = {gridBlocks: [...enemyGameGrid.gridBlocks]}
+        let i = Math.floor(Math.random() * 10)
+        let j = Math.floor(Math.random() * 10)
+        while (auxGridData.gridBlocks[i][j].fired) {
+            i = Math.floor(Math.random() * 10)
+            j = Math.floor(Math.random() * 10)
+        }
+        auxGridData.gridBlocks[i][j].fired = true
+        setEnemyGameGrid(auxGridData)
     }
 
     return (
@@ -258,11 +330,45 @@ const GamePage = () => {
                         <div className={"game-actions"}>
                             <div className={"actions-group"}>
                                 <Button onClick={changeSetupShipOrientation} type={"white"}>CHANGE SHIP ORIENTATION</Button>
-                                <Button onClick={randomizeSetupGrid} type={"white"}>RANDOMIZE</Button>
                                 <Button onClick={resetSetupGrid} type={"white"}>RESET GRID</Button>
+                                <Button onClick={randomizeSetupGrid} type={"white"} disabled>RANDOMIZE</Button>
                             </div>
                             <Button onClick={confirmSetupGrid} type={"blue"}
                                     disabled={setupGameShips.filter(s => s.placed === false).length > 0}>CONFIRM AND START GAME</Button>
+                        </div>
+                    </div>
+                }
+                {(gamePhase !== GamePhase.SETUP) &&
+                    <div className={"game-board-wrapper"}>
+                        <Card size={"sm"}>
+                            <div className={"game-board-card-head"}>
+                                <h4>My Fleet</h4>
+                                {/*<div className={"time"}>
+                                    <Alarm fontSize={"small"} /><h4>Time Left: --:--</h4>
+                                </div>*/}
+                                <h4>Enemy Fleet</h4>
+                            </div>
+                            <div className={"game-board-card-body"}>
+                                <GameGridCard
+                                    gridData={setupGameGrid}
+                                    onGridPointClick={onGridPointClick}
+                                    onGridPointHover={onGridPointHover}
+                                    onGridPointLeave={onGridPointLeave}/>
+                                <GameGridCard
+                                    gridData={enemyGameGrid}
+                                    onGridPointClick={onEnemyGridPointClick}
+                                    onGridPointHover={onEnemyGridPointHover}
+                                    onGridPointLeave={onEnemyGridPointLeave}
+                                    enemyGrid
+                                />
+                            </div>
+                        </Card>
+                        <div className={"game-actions"}>
+                            <div className={"actions-group"}>
+                                <Button onClick={fireRandomEnemyGamePoint} type={"white"}>RANDOM FIRE</Button>
+                            </div>
+                            <Button onClick={fireSelectedEnemyGamePoint} type={"blue"}
+                                    disabled={!selectedEnemyGamePoint}><ControlCamera/></Button>
                         </div>
                     </div>
                 }

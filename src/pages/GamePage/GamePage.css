@@ -20,6 +20,7 @@
 
 .game-board-card-head h4 {
     margin: 8px;
+    width: 100%;
 }
 
 .game-board-card-head .time {

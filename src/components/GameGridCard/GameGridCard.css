@@ -47,6 +47,18 @@
     background-color: rgba(0, 0, 0, .64);
 }
 
+.grid-point.ship.fired {
+    background-color: #E9404E;
+}
+
 .grid-point.placing {
     background-color: rgba(0, 0, 0, .16);
+}
+
+.grid-point.placing.water.fired {
+    background-color: #5C5CFF;
+}
+
+.grid-point.placing.ship.fired {
+    background-color: #E9404E;
 }

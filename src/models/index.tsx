@@ -38,6 +38,10 @@ export type GameGridPoint = {
     fired: boolean,
     hidden: boolean,
     placingShip: boolean
+    coordinates: {
+        x: number,
+        y: number
+    }
 }
 
 export enum GameGridPointType {
