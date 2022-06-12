@@ -18,12 +18,13 @@ export enum GameResult {
 
 export type GameSummary = {
     gameId: string | number,
+    gameDate
     gameResult?: GameResult,
-    enemyName: string
+    enemyName?: string,
 }
 
 export type Game = GameSummary & {
-    states: GameState[]
+    state: GameState
 }
 
 export type GameState = {
@@ -82,6 +83,23 @@ export enum GameMessageType {
     GET_BOARD = "GET_BOARD", BOARD_DATA = "BOARD_DATA",
     GET_STATE = "GET_STATE",
     SURRENDER = "SURRENDER", WINNER = "WINNER",
+}
+
+export type BackendGame = {
+    id: string,
+    createdAt: string,
+    ships: BackendShip[],
+    shots: BackendShot[],
+    started: boolean,
+    surrender: boolean,
+    turn: number,
+    user1: number,
+    user2: number,
+    user1SetShips: boolean,
+    user2SetShips: boolean,
+    winner: number
+    height: number,
+    width: number,
 }
 
 export type BackendShip = {

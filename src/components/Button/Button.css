@@ -8,6 +8,7 @@
     border: none;
     border-radius: 16px;
     transition: linear .1s;
+    white-space: nowrap;
 }
 
 .button-wrapper:hover {

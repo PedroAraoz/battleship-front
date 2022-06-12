@@ -4,6 +4,7 @@ import SockJS from "sockjs-client"
 import Stomp from "stompjs"
 import {get} from "../../utils/fetch"
 import {
+    BackendGame,
     BackendShip,
     BackendShot,
     Game,
@@ -25,8 +26,7 @@ import GameGridCard from "../../components/GameGridCard/GameGridCard"
 import {useAuth} from "../../utils/auth"
 import {SwapVert} from "@mui/icons-material"
 import Loader from "../../components/Loader/Loader"
-
-const GRID_SIZE = 10
+import {getGameGrid} from "../../utils/game"
 
 const ships: SetupShip[] = [
     {name: 'Carrier', size: 5, placed: false, startPos: {x: 0, y: 0}, endPos: {x: 0, y: 0}},
@@ -42,7 +42,6 @@ enum GamePhase {
     AWAY_TURN,
     HOME_WINS,
     AWAY_WINS
-
 }
 
 const GamePage = () => {
@@ -52,6 +51,7 @@ const GamePage = () => {
     let {gameId} = useParams()
 
     let [game, setGame] = useState<Game>()
+    let [gameHasStarted, setGameHasStarted] = useState(false)
     let [gamePhase, setGamePhase] = useState<GamePhase>()
 
     let [setupGameGrid, setSetupGameGrid] = useState(getGameGrid())
@@ -60,6 +60,7 @@ const GamePage = () => {
     let [setupShipSelected, setSetupShipSelected] = useState<SetupShip>()
     let [setupWaitingOpponent, setSetupWaitingOpponent] = useState(false)
 
+    let [enemyName, setEnemyName] = useState()
     let [enemyGameGrid, setEnemyGameGrid] = useState<GameGrid>()
 
     let [stompClient, setStompClient] = useState(null)
@@ -75,6 +76,7 @@ const GamePage = () => {
     useEffect(() => {
         if (stompClient) {
             get(`game/${gameId}`, auth.user().token)
+                .then((data: BackendGame) => {setGameHasStarted(data.started)})
                 .then(joinGame)
                 .catch(e => navigate("/not-found", {replace: true}))
         }
@@ -94,19 +96,28 @@ const GamePage = () => {
         stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.GET_BOARD}))
     }
 
+    function checkIfGameStarted() {
+        get(`game/${gameId}`, auth.user().token)
+            .then((data: BackendGame) => setGameHasStarted(data.started))
+            .catch(e => navigate("/not-found", {replace: true}))
+    }
+
     function onMessageReceived(msg) {
         const msgParsed = JSON.parse(msg.body)
         switch (msgParsed.type) {
             case GameMessageType.START: {
                 setGamePhase(GamePhase.SETUP)
+                checkIfGameStarted()
                 break
             }
             case GameMessageType.TURN_START: {
                 setGamePhase(GamePhase.HOME_TURN)
+                stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.GET_BOARD}))
                 break
             }
             case GameMessageType.WAITING: {
                 setGamePhase(GamePhase.AWAY_TURN)
+                stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.GET_BOARD}))
                 break
             }
             case GameMessageType.WINNER: {
@@ -139,56 +150,7 @@ const GamePage = () => {
     }
 
     function surrender() {
-        let m = {type: GameMessageType.SURRENDER}
-        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify(m))
-    }
-
-    function getGameGrid(ships?: BackendShip[], shots?: BackendShot[]): Grid {
-        let gridBlocks: GameGridPoint[][] = []
-        for (let i = 0; i < GRID_SIZE; i++) {
-            gridBlocks.push([])
-            for (let j = 0; j < GRID_SIZE; j++) {
-                gridBlocks[i].push({
-                    type: GameGridPointType.WATER,
-                    fired: false,
-                    hidden: false,
-                    placingShip: false,
-                    coordinates: {x: j, y: i}
-                })
-            }
-        }
-        if (ships) {
-            ships.forEach(s => {
-                const startX = s.startPos.x
-                const startY = s.startPos.y
-                const endX = s.endPos.x
-                const endY = s.endPos.y
-                for (let n = 0; n < s.size; n++) {
-                    if (startX === endX) {
-                        let gridPoint = gridBlocks[startY + n][startX]
-                        gridBlocks[startY + n][startX] =
-                            {...gridPoint, type: GameGridPointType.SHIP}
-                    } else {
-                        let gridPoint = gridBlocks[startY][endX + n]
-                        gridBlocks[startY][startX + n] =
-                            {...gridPoint, type: GameGridPointType.SHIP}
-                    }
-                }
-            })
-        }
-        if (shots) {
-            shots.forEach(s => {
-                const y = s.pos.y
-                const x = s.pos.x
-                let gridPoint = gridBlocks[y][x]
-                gridBlocks[y][x] = {
-                    ...gridPoint,
-                    fired: true,
-                    type: s.hit ? GameGridPointType.SHIP : GameGridPointType.WATER
-                }
-            })
-        }
-        return {gridBlocks: gridBlocks}
+        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.SURRENDER}))
     }
 
     function renderShipBlocks(s: SetupShip) {
@@ -338,13 +300,11 @@ const GamePage = () => {
     }
 
     function enemyGridPointClick(i, j) {
-        let m = {type: GameMessageType.SHOT, pos: {x: j, y: i}}
-        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify(m))
+        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.SHOT, pos: {x: j, y: i}}))
     }
 
     function fireRandomEnemyGamePoint() {
-        let m = {type: GameMessageType.SHOT, random: true}
-        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify(m))
+        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.SHOT, random: true}))
     }
 
     return (
@@ -370,39 +330,43 @@ const GamePage = () => {
                                     onGridPointClick={setupGridPointClick}
                                     onGridPointHover={setupGridPointHover}
                                     onGridPointLeave={setupGridPointLeave}/>
-                                <div className={"game-ships"}>
-                                    {setupGameShips.map((s, i) => {
-                                        return (
-                                            <div
-                                                className={`ship-wrapper${s.placed ? " placed" : ""}${setupShipSelected === s ? " selected" : ""}`}
-                                                onClick={() => {
-                                                    if (!s.placed) setSetupShipSelected(s)
-                                                }}
-                                                key={`${s.name}-${i}`}
-                                            >
-                                                <h4>{s.name}</h4>
-                                                {renderShipBlocks(s)}
-                                            </div>
-                                        )
-                                    })}
-                                </div>
+                                {gameHasStarted ?
+                                    <div className={"game-ships"}>
+                                        {setupGameShips.map((s, i) => {
+                                            return (
+                                                <div
+                                                    className={`ship-wrapper${s.placed ? " placed" : ""}${setupShipSelected === s ? " selected" : ""}`}
+                                                    onClick={() => {
+                                                        if (!s.placed) setSetupShipSelected(s)
+                                                    }}
+                                                    key={`${s.name}-${i}`}
+                                                >
+                                                    <h4>{s.name}</h4>
+                                                    {renderShipBlocks(s)}
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                    :
+                                    <Loader size={"lg"} color={"dark"}/>
+                                }
                             </div>
                         </Card>
                         <div className={"game-actions"}>
                             <div className={"actions-group"}>
-                                <Button onClick={changeSetupShipOrientation} type={"white"}>
+                                <Button disabled={setupWaitingOpponent || !gameHasStarted} onClick={changeSetupShipOrientation} type={"white"}>
                                     <SwapVert style={{
                                         transform: setupShipOrientation === ShipOrientation.HORIZONTAL ? "rotate(90deg)" : "",
                                         margin: "4px"
                                     }}/>
                                     CHANGE SHIP ORIENTATION
                                 </Button>
-                                <Button onClick={resetSetupGrid} type={"white"}>RESET GRID</Button>
-                                <Button onClick={randomSetupGrid} type={"white"} disabled>RANDOMIZE</Button>
+                                <Button disabled={setupWaitingOpponent || !gameHasStarted} onClick={resetSetupGrid} type={"white"}>RESET GRID</Button>
+                                <Button disabled={setupWaitingOpponent || !gameHasStarted} onClick={randomSetupGrid} type={"white"}>RANDOMIZE</Button>
                             </div>
                             <Button onClick={confirmSetupGrid} type={"blue"}
-                                    disabled={setupWaitingOpponent || setupGameShips.filter(s => s.placed === false).length > 0}
-                                    loading={setupWaitingOpponent}
+                                    disabled={setupWaitingOpponent || setupGameShips.filter(s => s.placed === false).length > 0 || !gameHasStarted}
+                                    loading={setupWaitingOpponent || !gameHasStarted}
                                     loadingText={"Waiting"}
                             >
                                 CONFIRM AND START GAME
@@ -424,9 +388,8 @@ const GamePage = () => {
                                 {enemyGameGrid ?
                                     <GameGridCard
                                         gridData={enemyGameGrid}
-                                        onGridPointClick={gamePhase === GamePhase.HOME_TURN ? enemyGridPointClick : () => {
-                                        }}
-                                        onGridPointHover={enemyGridPointHover}
+                                        onGridPointClick={gamePhase === GamePhase.HOME_TURN ? enemyGridPointClick : () => {}}
+                                        onGridPointHover={gamePhase === GamePhase.HOME_TURN ? enemyGridPointHover : () => {}}
                                         onGridPointLeave={enemyGridPointLeave}
                                         enemyGrid
                                     />

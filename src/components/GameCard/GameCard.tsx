@@ -25,7 +25,7 @@ const GameCard = (props: GameProps) => {
             <Accordion style={{"boxShadow": "none"}} expanded={expanded === `${summary.gameId}`} onChange={handleChange(`${summary.gameId}`)}>
                 <AccordionSummary expandIcon={<ExpandMore />} aria-controls={`${summary.gameId}-content`} id={`${summary.gameId}-header`}>
                     <div className="game-card-summary-wrapper">
-                        <h4>{`${summary.enemyName}`}</h4>
+                        <h4>Against{` ${summary.enemyName ? summary.enemyName : "Enemy"}`}{` on the ${summary.gameDate}`}</h4>
                         <div className={`game-card-summary-result-wrapper ${summary.gameResult}`}>
                             <h4>{summary.gameResult}</h4>
                             <Stars/>
@@ -34,8 +34,14 @@ const GameCard = (props: GameProps) => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <div className="game-card-details-wrapper">
-                        <GameGridCard gridData={lastGameState.myFleet} />
-                        <GameGridCard gridData={lastGameState.enemyFleet} />
+                        <div>
+                            <h4>My Fleet</h4>
+                            <GameGridCard gridData={lastGameState.myFleet} />
+                        </div>
+                        <div>
+                            <h4>Enemy Fleet</h4>
+                            <GameGridCard gridData={lastGameState.enemyFleet} />
+                        </div>
                     </div>
                 </AccordionDetails>
             </Accordion>

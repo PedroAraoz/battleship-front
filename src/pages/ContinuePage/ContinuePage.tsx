@@ -5,7 +5,7 @@ import Button from "../../components/Button/Button"
 import Card from "../../components/Card/Card"
 import Message from "../../components/Message/Message"
 import "./ContinuePage.css"
-import {get} from "../../utils/fetch"
+import {get, post} from "../../utils/fetch"
 import {useAuth} from "../../utils/auth"
 
 type LocationProps = {
@@ -30,8 +30,7 @@ const ContinuePage = () => {
     }
 
     function surrender(): void {
-        // TODO surrender logic
-        navigate("/home", { replace: true })
+        post(`game/${gameId}/surrender`, auth.user().token).then(() => navigate("/home", { replace: true }))
     }
 
     return gameId ? (

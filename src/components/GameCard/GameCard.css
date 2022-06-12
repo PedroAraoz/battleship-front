@@ -27,6 +27,15 @@
     color: #5C5CFF;
 }
 
-.game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper.defeat {
+.game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper.defeat,
+.game-card-wrapper .game-card-summary-wrapper .game-card-summary-result-wrapper.surrender {
     color: #E9404E;
+}
+
+.game-card-wrapper .game-card-details-wrapper {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-bottom: 32px;
 }
