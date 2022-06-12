@@ -10,18 +10,20 @@ import {Game} from "../../models"
 import "./HomePage.css"
 import {post} from "../../utils/fetch"
 import {useAuth} from "../../utils/auth"
-import {Container} from "@mui/material"
+import {Container, Snackbar} from "@mui/material"
 
 type LocationProps = {
     state: { from: Location }
 }
+
+// TODO fetch past games and check if there's an ongoing game (doesn't have a winner)
 
 const HomePage = () => {
     let location = useLocation() as unknown as LocationProps
     let navigate = useNavigate()
     let auth = useAuth()
 
-    let [ongoingGameId, setOngoingGameId] = useState(getOngoingGameId())
+    let [ongoingGameId, setOngoingGameId] = useState("")
 
     let [loadingPastGames, setLoadingPastGames] = useState(false)
     let [games, setGames] = useState<Game[]>([])
@@ -29,30 +31,35 @@ const HomePage = () => {
     let [searchingGame, setSearchingGame] = useState(false)
     let [joiningGame, setJoiningGame] = useState(false)
 
+    let [error, setError] = useState(false)
+    let [errorMessage, setErrorMessage] = useState("")
+
     useEffect(() => {
         // TODO fetch past games
         setLoadingPastGames(true)
-        setTimeout(() => setLoadingPastGames(false), 2000)
+        setTimeout(() => setLoadingPastGames(false), 1000)
     }, [])
+
+    function searchGame() {
+        setError(false)
+        setSearchingGame(true)
+        setTimeout(joinGame, 1000)
+    }
 
     function joinGame() {
         setSearchingGame(false)
         setJoiningGame(true)
-        post('game/join', auth.user().token).then(data => {
-            let gameId = data.res
-            if (!!gameId) navigate(`/game/${gameId ? gameId : "/game/undefined"}`) // TODO remove this /game/undefined
-            setJoiningGame(false)
-        })
-    }
-
-    function searchGame() {
-        setSearchingGame(true)
-        setTimeout(joinGame, 2000)
-    }
-
-    function getOngoingGameId(): string {
-        // TODO fetch ongoing gameId
-        return ""
+        post('game/join', auth.user().token)
+            .then(data => {
+                let gameId = data.res
+                navigate(`/game/${gameId}`)
+                setJoiningGame(false)
+            })
+            .catch(e => {
+                setJoiningGame(false)
+                setErrorMessage("Unable to join a new game. Please try again later!")
+                setError(true)
+            })
     }
 
     return ongoingGameId ? (
@@ -79,7 +86,7 @@ const HomePage = () => {
                                 return <GameCard
                                     key={`game-card-${g.gameId}`}
                                     lastGameState={g.states[g.states.length - 1]}
-                                    summary={{ gameId: g.gameId, enemy: g.enemy, result: g.result }} />
+                                    summary={{ gameId: g.gameId, gameResult: g.gameResult, enemyName: g.enemyName }} />
                             })}
                         </div> :
                         <div className="home-message-wrapper">
@@ -90,6 +97,13 @@ const HomePage = () => {
                     }
                 </Container>
             }
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={error}
+                onClose={() => setError(false)}
+                autoHideDuration={6000}
+                message={errorMessage}
+            />
         </Background>
     )
 }

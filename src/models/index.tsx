@@ -1,4 +1,5 @@
 export type User = {
+    id: number | string
     firstName: string,
     lastName: string,
     email: string,
@@ -12,12 +13,13 @@ export type AuthUser = User & {
 export enum GameResult {
     VICTORY = "victory",
     DEFEAT = "defeat",
+    SURRENDER = "surrender"
 }
 
 export type GameSummary = {
     gameId: string | number,
-    enemy: User,
-    result?: GameResult
+    gameResult?: GameResult,
+    enemyName: string
 }
 
 export type Game = GameSummary & {
@@ -56,10 +58,44 @@ export type Ship = {
 }
 
 export type SetupShip = Ship & {
-    placed: boolean
+    placed: boolean,
+    startPos: {
+        x: number,
+        y: number
+    }
+    endPos: {
+        x: number,
+        y: number
+    }
 }
 
 export enum ShipOrientation {
     VERTICAL,
     HORIZONTAL
+}
+
+export enum GameMessageType {
+    START = "START",
+    SHIP_PLACEMENT = "SHIP_PLACEMENT",
+    TURN_START = "TURN_START", WAITING = "WAITING",
+    SHOT = "SHOT", SHOT_RESULT = "SHOT_RESULT",
+    GET_BOARD = "GET_BOARD", BOARD_DATA = "BOARD_DATA",
+    GET_STATE = "GET_STATE",
+    SURRENDER = "SURRENDER", WINNER = "WINNER",
+}
+
+export type BackendShip = {
+    id: number
+    userId: number
+    size: number
+    health: number
+    startPos: {x: number, y: number}
+    endPos: {x: number, y: number}
+}
+
+export type BackendShot = {
+    id: number,
+    userId: number,
+    hit: boolean,
+    pos: {x: number, y: number}
 }

@@ -3,6 +3,7 @@ import {ExpandMore, Stars} from "@mui/icons-material"
 import React from "react"
 import {GameState, GameSummary} from "../../models"
 import "./GameCard.css"
+import GameGridCard from "../GameGridCard/GameGridCard"
 
 export type GameProps = {
     summary: GameSummary,
@@ -24,16 +25,17 @@ const GameCard = (props: GameProps) => {
             <Accordion style={{"boxShadow": "none"}} expanded={expanded === `${summary.gameId}`} onChange={handleChange(`${summary.gameId}`)}>
                 <AccordionSummary expandIcon={<ExpandMore />} aria-controls={`${summary.gameId}-content`} id={`${summary.gameId}-header`}>
                     <div className="game-card-summary-wrapper">
-                        <h4>{`${summary.enemy.firstName} ${summary.enemy.lastName}`}</h4>
-                        <div className={`game-card-summary-result-wrapper ${summary.result}`}>
-                            <h4>{summary.result}</h4>
+                        <h4>{`${summary.enemyName}`}</h4>
+                        <div className={`game-card-summary-result-wrapper ${summary.gameResult}`}>
+                            <h4>{summary.gameResult}</h4>
                             <Stars/>
                         </div>
                     </div>
                 </AccordionSummary>
                 <AccordionDetails>
                     <div className="game-card-details-wrapper">
-                        {/* TODO render last game states (game grids) */}
+                        <GameGridCard gridData={lastGameState.myFleet} />
+                        <GameGridCard gridData={lastGameState.enemyFleet} />
                     </div>
                 </AccordionDetails>
             </Accordion>

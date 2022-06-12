@@ -1,22 +1,29 @@
-import React from "react"
+import React, {useEffect} from "react"
 import {Navigate, useLocation, useNavigate, useParams} from "react-router-dom"
 import Background from "../../components/Background/Background"
 import Button from "../../components/Button/Button"
 import Card from "../../components/Card/Card"
 import Message from "../../components/Message/Message"
 import "./ContinuePage.css"
+import {get} from "../../utils/fetch"
+import {useAuth} from "../../utils/auth"
 
 type LocationProps = {
     state: { from: Location }
 }
 
 const ContinuePage = () => {
+    let auth = useAuth()
     let navigate = useNavigate()
     let location = useLocation() as unknown as LocationProps
 
-    let {gameId} = useParams() // TODO if gameId doesn't correspond to an ongoing game involving the logged in user, redirect to not found
+    let {gameId} = useParams()
 
     const from = location.state?.from?.pathname || "/home"
+
+    useEffect(() => {
+        get(`game/${gameId}`, auth.user().token).catch(e => navigate("/not-found", { replace: true }))
+    }, [])
 
     function keepPlaying(): void {
         navigate(`/game/${gameId}`, { replace: true })

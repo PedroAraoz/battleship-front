@@ -19,7 +19,7 @@ const Button = (props: PropsWithChildren<ButtonProps>) => {
         <button className={`button-wrapper ${type} ${disabled ? "disabled" : ""} ${loading ? "loading" : ""}`} onClick={onClick} disabled={disabled || loading}>
             {loading ?
                 <div className="button-loading">
-                    <Loader text={loadingText} size={"sm"} color={type === "white" ? "dark" : "light"} />
+                    <Loader text={loadingText} size={"sm"} color={"dark"} />
                 </div>
                 :
                 children
