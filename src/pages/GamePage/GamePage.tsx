@@ -5,12 +5,7 @@ import Stomp from "stompjs"
 import {get} from "../../utils/fetch"
 import {
     BackendGame,
-    BackendShip,
-    BackendShot,
-    Game,
     GameGrid,
-    GameGrid as Grid,
-    GameGridPoint,
     GameGridPointType,
     GameMessageType,
     SetupShip,
@@ -50,7 +45,6 @@ const GamePage = () => {
 
     let {gameId} = useParams()
 
-    let [game, setGame] = useState<Game>()
     let [gameHasStarted, setGameHasStarted] = useState(false)
     let [gamePhase, setGamePhase] = useState<GamePhase>()
 
@@ -60,7 +54,6 @@ const GamePage = () => {
     let [setupShipSelected, setSetupShipSelected] = useState<SetupShip>()
     let [setupWaitingOpponent, setSetupWaitingOpponent] = useState(false)
 
-    let [enemyName, setEnemyName] = useState()
     let [enemyGameGrid, setEnemyGameGrid] = useState<GameGrid>()
 
     let [stompClient, setStompClient] = useState(null)

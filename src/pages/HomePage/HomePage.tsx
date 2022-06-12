@@ -17,8 +17,6 @@ type LocationProps = {
     state: { from: Location }
 }
 
-// TODO fetch past games and check if there's an ongoing game (doesn't have a winner)
-
 const HomePage = () => {
     let location = useLocation() as unknown as LocationProps
     let navigate = useNavigate()
