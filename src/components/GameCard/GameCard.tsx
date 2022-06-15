@@ -28,7 +28,6 @@ const GameCard = (props: GameProps) => {
                         <h4>Against{` ${summary.enemyName ? summary.enemyName : "Enemy"}`}{` on the ${summary.gameDate}`}</h4>
                         <div className={`game-card-summary-result-wrapper ${summary.gameResult}`}>
                             <h4>{summary.gameResult}</h4>
-                            <Stars/>
                         </div>
                     </div>
                 </AccordionSummary>

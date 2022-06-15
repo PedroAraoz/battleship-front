@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useRef, useState} from "react"
 import {Navigate, useLocation, useNavigate} from "react-router-dom"
 import Background from "../../components/Background/Background"
 import Card from "../../components/Card/Card"
@@ -16,14 +16,22 @@ const LoginPage = () => {
     let navigate = useNavigate()
     let location = useLocation() as unknown as LocationProps
     let auth = useAuth()
+    let googleButton = useRef(null)
 
     let [isLoading, setIsLoading] = useState(false)
 
     const from = location.state?.from?.pathname || "/home"
 
     useEffect(() => {
-        (window as any).handleCredentialResponse = handleCredentialResponse
-    }, [])
+        if (googleButton.current) {
+            (window as any).google.accounts.id.initialize({
+                client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+                callback: handleCredentialResponse
+            });
+            (window as any).google.accounts.id.renderButton(googleButton.current, {type: 'standard'});
+            (window as any).google.accounts.id.prompt();
+        }
+    }, [googleButton.current])
 
     function handleCredentialResponse(response: any) {
         setIsLoading(true)
@@ -45,11 +53,7 @@ const LoginPage = () => {
                 :
                 <Card size="lg" raised transparent>
                     <Message messages={[{id: "login-message-1", message: "Please login with your Google account to start playing!"}]} />
-                    <div id="g_id_onload"
-                        data-client_id={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-                        data-callback={"handleCredentialResponse"}>
-                    </div>
-                    <div className="g_id_signin" data-type="standard" />
+                    <div ref={googleButton} />
                 </Card>
             }
         </Background>

@@ -51,7 +51,7 @@ const HomePage = () => {
                         gameId: g.id,
                         gameResult: `${g.winner}` === userId ? GameResult.VICTORY : g.surrender ? GameResult.SURRENDER : GameResult.DEFEAT,
                         // enemyName: `${g.user1}` === `${userId}` ? getEnemyName(g.user2) : getEnemyName(g.user1),
-                        gameDate: new Date(g.createdAt).toLocaleDateString(),
+                        gameDate: new Date(g.createdAt.replace('-', ',')).toLocaleDateString(),
                         state: {
                             myFleet: getGameGrid(g.ships.filter(s => `${s.userId}` === `${userId}`), g.shots.filter(s => `${s.userId}` !== `${userId}`)),
                             enemyFleet: getGameGrid(g.ships.filter(s => `${s.userId}` !== `${userId}`), g.shots.filter(s => `${s.userId}` === `${userId}`))

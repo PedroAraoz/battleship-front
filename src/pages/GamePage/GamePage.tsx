@@ -21,7 +21,7 @@ import GameGridCard from "../../components/GameGridCard/GameGridCard"
 import {useAuth} from "../../utils/auth"
 import {SwapVert} from "@mui/icons-material"
 import Loader from "../../components/Loader/Loader"
-import {getGameGrid} from "../../utils/game"
+import {getGameGrid, setRandomGameGrid, overlapsShipHorizontally, overlapsShipVertically} from "../../utils/game"
 
 const ships: SetupShip[] = [
     {name: 'Carrier', size: 5, placed: false, startPos: {x: 0, y: 0}, endPos: {x: 0, y: 0}},
@@ -49,7 +49,7 @@ const GamePage = () => {
     let [gamePhase, setGamePhase] = useState<GamePhase>()
 
     let [setupGameGrid, setSetupGameGrid] = useState(getGameGrid())
-    let [setupGameShips, setSetupGameShips] = useState(ships)
+    let [setupGameShips, setSetupGameShips] = useState<SetupShip[]>(ships)
     let [setupShipOrientation, setSetupShipOrientation] = useState<ShipOrientation>(ShipOrientation.HORIZONTAL)
     let [setupShipSelected, setSetupShipSelected] = useState<SetupShip>()
     let [setupWaitingOpponent, setSetupWaitingOpponent] = useState(false)
@@ -69,7 +69,9 @@ const GamePage = () => {
     useEffect(() => {
         if (stompClient) {
             get(`game/${gameId}`, auth.user().token)
-                .then((data: BackendGame) => {setGameHasStarted(data.started)})
+                .then((data: BackendGame) => {
+                    setGameHasStarted(data.started)
+                })
                 .then(joinGame)
                 .catch(e => navigate("/not-found", {replace: true}))
         }
@@ -160,7 +162,7 @@ const GamePage = () => {
     }
 
     function randomSetupGrid() {
-        //TODO random ship placement logic
+        setRandomGameGrid([...ships], [], getGameGrid(), setSetupGameShips, setSetupGameGrid)
     }
 
     function confirmSetupGrid() {
@@ -221,22 +223,6 @@ const GamePage = () => {
         }
     }
 
-    function overlapsShipHorizontally(i, j) {
-        let overlaps = false
-        for (let n = j; n < j + setupShipSelected.size; n++) {
-            if (setupGameGrid.gridBlocks[i][n].type === GameGridPointType.SHIP) overlaps = true
-        }
-        return overlaps
-    }
-
-    function overlapsShipVertically(i, j) {
-        let overlaps = false
-        for (let n = i; n < i + setupShipSelected.size; n++) {
-            if (setupGameGrid.gridBlocks[n][j].type === GameGridPointType.SHIP) overlaps = true
-        }
-        return overlaps
-    }
-
     function setupGridPointHover(i, j): boolean {
         let auxGridData = {gridBlocks: [...setupGameGrid.gridBlocks]}
         let placing = false
@@ -244,7 +230,7 @@ const GamePage = () => {
             let gridSize = auxGridData.gridBlocks.length
             if (setupShipOrientation === ShipOrientation.HORIZONTAL) {
                 if (j + setupShipSelected.size <= gridSize) {
-                    if (!overlapsShipHorizontally(i, j)) {
+                    if (!overlapsShipHorizontally(i, j, setupGameGrid, setupShipSelected)) {
                         for (let n = 0; n < setupShipSelected.size; n++) {
                             auxGridData.gridBlocks[i][j + n].placingShip = true
                             placing = true
@@ -253,7 +239,7 @@ const GamePage = () => {
                 }
             } else {
                 if (i + setupShipSelected.size <= gridSize) {
-                    if (!overlapsShipVertically(i, j)) {
+                    if (!overlapsShipVertically(i, j, setupGameGrid, setupShipSelected)) {
                         for (let n = 0; n < setupShipSelected.size; n++) {
                             auxGridData.gridBlocks[i + n][j].placingShip = true
                             placing = true
@@ -293,11 +279,17 @@ const GamePage = () => {
     }
 
     function enemyGridPointClick(i, j) {
-        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.SHOT, pos: {x: j, y: i}}))
+        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({
+            type: GameMessageType.SHOT,
+            pos: {x: j, y: i}
+        }))
     }
 
     function fireRandomEnemyGamePoint() {
-        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.SHOT, random: true}))
+        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({
+            type: GameMessageType.SHOT,
+            random: true
+        }))
     }
 
     return (
@@ -347,15 +339,18 @@ const GamePage = () => {
                         </Card>
                         <div className={"game-actions"}>
                             <div className={"actions-group"}>
-                                <Button disabled={setupWaitingOpponent || !gameHasStarted} onClick={changeSetupShipOrientation} type={"white"}>
+                                <Button disabled={setupWaitingOpponent || !gameHasStarted}
+                                        onClick={changeSetupShipOrientation} type={"white"}>
                                     <SwapVert style={{
                                         transform: setupShipOrientation === ShipOrientation.HORIZONTAL ? "rotate(90deg)" : "",
                                         margin: "4px"
                                     }}/>
                                     CHANGE SHIP ORIENTATION
                                 </Button>
-                                <Button disabled={setupWaitingOpponent || !gameHasStarted} onClick={resetSetupGrid} type={"white"}>RESET GRID</Button>
-                                <Button disabled={setupWaitingOpponent || !gameHasStarted} onClick={randomSetupGrid} type={"white"}>RANDOMIZE</Button>
+                                <Button disabled={setupWaitingOpponent || !gameHasStarted} onClick={resetSetupGrid}
+                                        type={"white"}>RESET GRID</Button>
+                                <Button disabled={setupWaitingOpponent || !gameHasStarted} onClick={randomSetupGrid}
+                                        type={"white"}>RANDOM GRID</Button>
                             </div>
                             <Button onClick={confirmSetupGrid} type={"blue"}
                                     disabled={setupWaitingOpponent || setupGameShips.filter(s => s.placed === false).length > 0 || !gameHasStarted}
@@ -381,8 +376,10 @@ const GamePage = () => {
                                 {enemyGameGrid ?
                                     <GameGridCard
                                         gridData={enemyGameGrid}
-                                        onGridPointClick={gamePhase === GamePhase.HOME_TURN ? enemyGridPointClick : () => {}}
-                                        onGridPointHover={gamePhase === GamePhase.HOME_TURN ? enemyGridPointHover : () => {}}
+                                        onGridPointClick={gamePhase === GamePhase.HOME_TURN ? enemyGridPointClick : () => {
+                                        }}
+                                        onGridPointHover={gamePhase === GamePhase.HOME_TURN ? enemyGridPointHover : () => {
+                                        }}
                                         onGridPointLeave={enemyGridPointLeave}
                                         enemyGrid
                                     />
