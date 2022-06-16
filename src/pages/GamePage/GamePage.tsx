@@ -22,6 +22,7 @@ import {useAuth} from "../../utils/auth"
 import {SwapVert} from "@mui/icons-material"
 import Loader from "../../components/Loader/Loader"
 import {getGameGrid, setRandomGameGrid, overlapsShipHorizontally, overlapsShipVertically} from "../../utils/game"
+import hit from '../../assets/hit.mp3'
 
 const ships: SetupShip[] = [
     {name: 'Carrier', size: 5, placed: false, startPos: {x: 0, y: 0}, endPos: {x: 0, y: 0}},
@@ -42,6 +43,7 @@ enum GamePhase {
 const GamePage = () => {
     let navigate = useNavigate()
     let auth = useAuth()
+    let audio = new Audio(hit)
 
     let {gameId} = useParams()
 
@@ -129,6 +131,9 @@ const GamePage = () => {
                 break
             }
             case GameMessageType.SHOT_RESULT: {
+                if (msgParsed.hit === true) {
+                    audio.play()
+                }
                 stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.GET_BOARD}))
                 break
             }
@@ -355,7 +360,7 @@ const GamePage = () => {
                             <Button onClick={confirmSetupGrid} type={"blue"}
                                     disabled={setupWaitingOpponent || setupGameShips.filter(s => s.placed === false).length > 0 || !gameHasStarted}
                                     loading={setupWaitingOpponent || !gameHasStarted}
-                                    loadingText={"Waiting"}
+                                    loadingText={"Waiting for enemy..."}
                             >
                                 CONFIRM AND START GAME
                             </Button>
@@ -393,7 +398,7 @@ const GamePage = () => {
                                 <Button onClick={fireRandomEnemyGamePoint}
                                         disabled={gamePhase !== GamePhase.HOME_TURN}
                                         loading={gamePhase !== GamePhase.HOME_TURN && gamePhase !== GamePhase.HOME_WINS && gamePhase !== GamePhase.AWAY_WINS}
-                                        loadingText={"Waiting..."}
+                                        loadingText={"Waiting for enemy..."}
                                         type={"white"}>RANDOM FIRE</Button>
                             </div>
                         </div>

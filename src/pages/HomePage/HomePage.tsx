@@ -111,7 +111,7 @@ const HomePage = () => {
                 <Container>
                     {games.length > 0 ?
                         <div className="home-past-games-wrapper">
-                            {games.map(g => {
+                            {games.reverse().map(g => {
                                 return <GameCard
                                     key={`game-card-${g.gameId}`}
                                     lastGameState={g.state}
