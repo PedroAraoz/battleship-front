@@ -12,7 +12,7 @@ import {
     ShipOrientation
 } from "../../models"
 import Background from "../../components/Background/Background"
-import {Alert, Container, Snackbar} from "@mui/material"
+import {Alert, Container, FormControlLabel, Snackbar, Switch} from "@mui/material"
 import User from "../../components/User/User"
 import Button from "../../components/Button/Button"
 import Card from "../../components/Card/Card"
@@ -297,6 +297,12 @@ const GamePage = () => {
         }))
     }
 
+    function handleChange(event) {
+        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({
+            type: GameMessageType.AUTOSHOOT
+        }))
+    }
+
     return (
         <Background>
             <Container>
@@ -400,6 +406,17 @@ const GamePage = () => {
                                         loading={gamePhase !== GamePhase.HOME_TURN && gamePhase !== GamePhase.HOME_WINS && gamePhase !== GamePhase.AWAY_WINS}
                                         loadingText={"Waiting for enemy..."}
                                         type={"white"}>RANDOM FIRE</Button>
+
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            color={"error"}
+                                            onChange={handleChange}
+                                        ></Switch>
+                                    }
+                                    label={"AutoShoot"}
+                                    labelPlacement={"top"}
+                                />
                             </div>
                         </div>
                     </div>
