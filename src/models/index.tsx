@@ -20,7 +20,7 @@ export type GameSummary = {
     gameId: string | number,
     gameDate
     gameResult?: GameResult,
-    enemyName?: string,
+    enemyId?: string,
 }
 
 export type Game = GameSummary & {
