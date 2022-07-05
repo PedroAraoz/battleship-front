@@ -47,11 +47,12 @@ const HomePage = () => {
                 }
                 games = data.filter((g: BackendGame) => g.winner).map((g: BackendGame) => {
                     const userId = auth.user().id
+                    const enemyId = [g.user1, g.user2].filter(u => u.toString() !== userId)[0]
                     return {
                         gameId: g.id,
                         gameResult: `${g.winner}` === userId ? GameResult.VICTORY : g.surrender ? GameResult.SURRENDER : GameResult.DEFEAT,
-                        // enemyName: `${g.user1}` === `${userId}` ? getEnemyName(g.user2) : getEnemyName(g.user1),
-                        gameDate: new Date(g.createdAt.replace('-', ',')).toLocaleDateString(),
+                        enemyId,
+                        gameDate: new Date(g.createdAt.replaceAll('-', ',')).toLocaleDateString(),
                         state: {
                             myFleet: getGameGrid(g.ships.filter(s => `${s.userId}` === `${userId}`), g.shots.filter(s => `${s.userId}` !== `${userId}`)),
                             enemyFleet: getGameGrid(g.ships.filter(s => `${s.userId}` !== `${userId}`), g.shots.filter(s => `${s.userId}` === `${userId}`))
@@ -118,7 +119,7 @@ const HomePage = () => {
                                     summary={{
                                         gameId: g.gameId,
                                         gameResult: g.gameResult,
-                                        enemyName: g.enemyName,
+                                        enemyId: g.enemyId,
                                         gameDate: g.gameDate
                                     }}/>
                             })}

@@ -20,7 +20,7 @@ export type GameSummary = {
     gameId: string | number,
     gameDate
     gameResult?: GameResult,
-    enemyName?: string,
+    enemyId?: string,
 }
 
 export type Game = GameSummary & {
@@ -83,6 +83,7 @@ export enum GameMessageType {
     GET_BOARD = "GET_BOARD", BOARD_DATA = "BOARD_DATA",
     GET_STATE = "GET_STATE",
     SURRENDER = "SURRENDER", WINNER = "WINNER",
+    AUTOSHOOT = "AUTOSHOOT",
 }
 
 export type BackendGame = {
