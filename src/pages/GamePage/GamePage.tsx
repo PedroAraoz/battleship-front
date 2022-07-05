@@ -62,6 +62,8 @@ const GamePage = () => {
     let [messages, setMessages] = useState([])
     let [sub, setSub] = useState(null)
 
+    let [isAutoShooting, setIsAutoShooting] = useState<boolean>(false)
+
     const userId = auth.user().id
 
     useEffect(() => {
@@ -128,6 +130,7 @@ const GamePage = () => {
             case GameMessageType.BOARD_DATA: {
                 setSetupGameGrid(getGameGrid(msgParsed.ships, msgParsed.opponentShots))
                 setEnemyGameGrid(getGameGrid([], msgParsed.yourShots))
+                setIsAutoShooting(msgParsed.autoShooting)
                 break
             }
             case GameMessageType.SHOT_RESULT: {
@@ -298,9 +301,8 @@ const GamePage = () => {
     }
 
     function handleChange(event) {
-        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({
-            type: GameMessageType.AUTOSHOOT
-        }))
+        stompClient.send(`/app/game/${gameId}/${userId}`, {}, JSON.stringify({type: GameMessageType.AUTOSHOOT}))
+        setIsAutoShooting(!isAutoShooting)
     }
 
     return (
@@ -412,10 +414,11 @@ const GamePage = () => {
                                         <Switch
                                             color={"error"}
                                             onChange={handleChange}
+                                            checked={isAutoShooting}
                                         ></Switch>
                                     }
-                                    label={"AutoShoot"}
-                                    labelPlacement={"top"}
+                                    label={"Auto Shoot"}
+                                    labelPlacement={"end"}
                                 />
                             </div>
                         </div>
